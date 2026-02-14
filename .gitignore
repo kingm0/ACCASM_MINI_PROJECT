@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Uploads and generated files
+uploads/*
+!uploads/.gitkeep
+static/cropped_images/*
+!static/cropped_images/.gitkeep
+static/outputs/*
+!static/outputs/.gitkeep
+static/page_images/*
+!static/page_images/.gitkeep
+static/segmentated_images/*
+!static/segmentated_images/.gitkeep
+*.png
+*.jpg
+*.jpeg
+!static/images/*.png
+!static/images/*.jpg
+!static/images/*.jpeg
+
+# Logs
+*.log
+
+# Model files (too large for GitHub - use Git LFS or external storage)
+segmentation/documents-segment-classification-main/yolo-coco/*.weights
+segmentation/documents-segment-classification-main/yolo-coco/*.cfg
+segmentation/documents-segment-classification-main/*.zip
+segmentation/documents-segment-classification-main/*.pt
+
+# Large binary files
+*.dll
+*.so
+*.dylib
+
+# Training data (too large)
+segmentation/documents-segment-classification-main/Training/
+segmentation/documents-segment-classification-main/input_pdf_file/
+segmentation/documents-segment-classification-main/poppler-0.68.0/
+
+# Generated/cache images
+cropped_images/
+static/cropped_images/
+static/segmentated_images/
+static/page_images/
+static/outputs/
+uploads/*.pdf
+

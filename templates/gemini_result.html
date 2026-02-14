@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Analysis Results - ACCASM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            width: 50px;
+            height: auto;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+        
+        .logo h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .results-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .results-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .gemini-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(78,205,196,0.3);
+        }
+        
+        .gemini-badge i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        
+        .results-layout {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            min-height: 600px;
+        }
+        
+        .pages-section {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .analysis-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+        
+        .pages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .page-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .page-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .page-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+        
+        .page-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(102,126,234,0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .card-header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .audio-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+        
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+        }
+        
+        .audio-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .audio-btn.playing {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            animation: pulse 1s infinite;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+            margin-left: 8px;
+        }
+        
+        .pause-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+        }
+        
+        .pause-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .pause-btn.playing {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon.summary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .card-icon.insights {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+        
+        .card-icon.keywords {
+            background: linear-gradient(135deg, #45b7d1, #96c93d);
+        }
+        
+        .card-icon.recommendations {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .card-icon.page-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+        
+        .card-content {
+            color: #666;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .keywords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .keyword-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(102,126,234,0.3);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+        
+        .action-btn.accessibility {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-card {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .result-card:nth-child(1) { animation-delay: 0.1s; }
+        .result-card:nth-child(2) { animation-delay: 0.2s; }
+        .result-card:nth-child(3) { animation-delay: 0.3s; }
+        .result-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .results-title {
+                font-size: 2rem;
+            }
+            
+            .results-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .pages-section {
+                max-height: 400px;
+            }
+            
+            .page-image {
+                max-height: 300px;
+                object-fit: contain;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .card-header-left {
+                width: 100%;
+            }
+            
+            .audio-btn {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="../static/images/logos.png" alt="ACCASM Logo">
+                <h1>ACCASM</h1>
+            </div>
+            <a href="/use" class="back-btn">
+                <i class="fa fa-arrow-left"></i>
+                Back to Upload
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="results-header">
+            <h1 class="results-title">AI Analysis Complete</h1>
+            <p class="results-subtitle">Your document has been processed by ACCASM</p>
+            <div class="gemini-badge">
+                <i class="fa fa-magic"></i>
+                Powered by ACCASM
+            </div>
+        </div>
+        
+        <div class="results-layout">
+            <!-- Left Side: Document Pages -->
+            <div class="pages-section">
+                <h3 class="section-title">
+                    <i class="fa fa-file-pdf-o"></i>
+                    Document Pages
+                </h3>
+                <div class="pages-container">
+                    {% for page_url in page_urls %}
+                    <div class="page-item">
+                        <img src="{{ page_url }}" alt="Document Page {{ loop.index }}" class="page-image">
+                        <div class="page-number">Page {{ loop.index }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Right Side: Detailed Page Explanations -->
+            <div class="analysis-section">
+                {% for page_explanation in page_explanations %}
+                <div class="result-card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-icon page-icon">
+                                <i class="fa fa-file-text-o"></i>
+                            </div>
+                            <h3 class="card-title">Page {{ loop.index }} - Detailed Explanation</h3>
+                        </div>
+                        <button class="audio-btn" onclick="playAudio('page_{{ loop.index }}')" title="Play Page {{ loop.index }} Audio">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                        <button class="pause-btn" onclick="pauseAudio()" title="Pause Audio" style="display: none;">
+                            <i class="fa fa-pause"></i>
+                        </button>
+                    </div>
+                    <div class="card-content" id="page_{{ loop.index }}-content">
+                        {{ page_explanation }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/use" class="action-btn primary">
+                <i class="fa fa-upload"></i>
+                Process Another Document
+            </a>
+            <button class="action-btn secondary" onclick="downloadReport()">
+                <i class="fa fa-download"></i>
+                Download Report
+            </button>
+            <button class="action-btn accessibility" onclick="playAllAudio()">
+                <i class="fa fa-volume-up"></i>
+                Play All Audio
+            </button>
+            <button class="action-btn accessibility" onclick="pauseAudio()" id="globalPauseBtn" style="display: none;">
+                <i class="fa fa-pause"></i>
+                Pause Audio
+            </button>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Generating your report...</p>
+        </div>
+    </div>
+    
+    <script>
+        // Text-to-Speech functionality
+        let currentSpeech = null;
+        let isPaused = false;
+        
+        function playAudio(section) {
+            // Stop any currently playing speech
+            if (currentSpeech) {
+                speechSynthesis.cancel();
+                currentSpeech = null;
+                // Reset all audio buttons
+                document.querySelectorAll('.audio-btn').forEach(btn => {
+                    btn.classList.remove('playing');
+                    btn.innerHTML = '<i class="fa fa-volume-up"></i>';
+                });
+            }
+            
+            const contentElement = document.getElementById(section + '-content');
+            let text = '';
+            
+            if (section === 'keywords') {
+                // Extract keywords from the tags
+                const keywordTags = contentElement.querySelectorAll('.keyword-tag');
+                text = 'Key topics include: ' + Array.from(keywordTags).map(tag => tag.textContent).join(', ');
+            } else {
+                text = contentElement.textContent.trim();
+            }
+            
+            if (!text) {
+                alert('No content available for audio playback.');
+                return;
+            }
+            
+            // Update the button to show it's playing
+            const audioBtn = event.target.closest('.audio-btn');
+            audioBtn.classList.add('playing');
+            audioBtn.innerHTML = '<i class="fa fa-stop"></i>';
+            
+            // Create speech synthesis
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.8; // Slightly slower for better comprehension
+            utterance.pitch = 1;
+            utterance.volume = 0.9;
+            
+            // Try to use a more natural voice if available
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.name.includes('Google') || 
+                voice.name.includes('Microsoft') || 
+                voice.name.includes('Samantha') ||
+                voice.name.includes('Alex')
+            );
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+            
+            // Event handlers
+            utterance.onstart = function() {
+                console.log('Speech started');
+            };
+            
+            utterance.onend = function() {
+                console.log('Speech ended');
+                audioBtn.classList.remove('playing');
+                audioBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+                currentSpeech = null;
+                isPaused = false;
+                
+                // Hide pause button
+                const pauseBtn = document.querySelector('.pause-btn');
+                if (pauseBtn) {
+                    pauseBtn.style.display = 'none';
+                    pauseBtn.classList.remove('playing');
+                    pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                    pauseBtn.title = 'Pause Audio';
+                }
+                
+                // Hide global pause button
+                const globalPauseBtn = document.getElementById('globalPauseBtn');
+                if (globalPauseBtn) {
+                    globalPauseBtn.style.display = 'none';
+                    globalPauseBtn.innerHTML = '<i class="fa fa-pause"></i> Pause Audio';
+                }
+            };
+            
+            utterance.onerror = function(event) {
+                console.error('Speech error:', event.error);
+                audioBtn.classList.remove('playing');
+                audioBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+                currentSpeech = null;
+                isPaused = false;
+                
+                // Hide pause button
+                const pauseBtn = document.querySelector('.pause-btn');
+                if (pauseBtn) {
+                    pauseBtn.style.display = 'none';
+                    pauseBtn.classList.remove('playing');
+                    pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                    pauseBtn.title = 'Pause Audio';
+                }
+                
+                // Hide global pause button
+                const globalPauseBtn = document.getElementById('globalPauseBtn');
+                if (globalPauseBtn) {
+                    globalPauseBtn.style.display = 'none';
+                    globalPauseBtn.innerHTML = '<i class="fa fa-pause"></i> Pause Audio';
+                }
+                
+                alert('Error playing audio. Please try again.');
+            };
+            
+            currentSpeech = utterance;
+            speechSynthesis.speak(utterance);
+            
+            // Show pause button
+            const pauseBtn = document.querySelector('.pause-btn');
+            if (pauseBtn) {
+                pauseBtn.style.display = 'flex';
+                pauseBtn.classList.add('playing');
+            }
+        }
+        
+        function pauseAudio() {
+            if (currentSpeech && !isPaused) {
+                speechSynthesis.pause();
+                isPaused = true;
+                
+                // Update individual pause button
+                const pauseBtn = document.querySelector('.pause-btn');
+                if (pauseBtn) {
+                    pauseBtn.innerHTML = '<i class="fa fa-play"></i>';
+                    pauseBtn.title = 'Resume Audio';
+                }
+                
+                // Update global pause button
+                const globalPauseBtn = document.getElementById('globalPauseBtn');
+                if (globalPauseBtn) {
+                    globalPauseBtn.innerHTML = '<i class="fa fa-play"></i> Resume Audio';
+                }
+            } else if (currentSpeech && isPaused) {
+                speechSynthesis.resume();
+                isPaused = false;
+                
+                // Update individual pause button
+                const pauseBtn = document.querySelector('.pause-btn');
+                if (pauseBtn) {
+                    pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                    pauseBtn.title = 'Pause Audio';
+                }
+                
+                // Update global pause button
+                const globalPauseBtn = document.getElementById('globalPauseBtn');
+                if (globalPauseBtn) {
+                    globalPauseBtn.innerHTML = '<i class="fa fa-pause"></i> Pause Audio';
+                }
+            }
+        }
+        
+        function playAllAudio() {
+            // Stop any currently playing speech
+            if (currentSpeech) {
+                speechSynthesis.cancel();
+                currentSpeech = null;
+                isPaused = false;
+                // Reset all audio buttons
+                document.querySelectorAll('.audio-btn').forEach(btn => {
+                    btn.classList.remove('playing');
+                    btn.innerHTML = '<i class="fa fa-volume-up"></i>';
+                });
+                
+                // Hide pause button
+                const pauseBtn = document.querySelector('.pause-btn');
+                if (pauseBtn) {
+                    pauseBtn.style.display = 'none';
+                    pauseBtn.classList.remove('playing');
+                    pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                    pauseBtn.title = 'Pause Audio';
+                }
+                
+                // Hide global pause button
+                const globalPauseBtn = document.getElementById('globalPauseBtn');
+                if (globalPauseBtn) {
+                    globalPauseBtn.style.display = 'none';
+                    globalPauseBtn.innerHTML = '<i class="fa fa-pause"></i> Pause Audio';
+                }
+            }
+            
+            // Get all page sections dynamically
+            const pageCards = document.querySelectorAll('.result-card');
+            const sections = Array.from(pageCards).map((card, index) => `page_${index + 1}`);
+            let currentIndex = 0;
+            
+            function playNextSection() {
+                if (currentIndex >= sections.length) {
+                    console.log('All sections played');
+                    return;
+                }
+                
+                const section = sections[currentIndex];
+                const contentElement = document.getElementById(section + '-content');
+                let text = '';
+                
+                text = contentElement.textContent.trim();
+                
+                if (text) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1;
+                    utterance.volume = 0.9;
+                    
+                    // Try to use a more natural voice if available
+                    const voices = speechSynthesis.getVoices();
+                    const preferredVoice = voices.find(voice => 
+                        voice.name.includes('Google') || 
+                        voice.name.includes('Microsoft') || 
+                        voice.name.includes('Samantha') ||
+                        voice.name.includes('Alex')
+                    );
+                    
+                    if (preferredVoice) {
+                        utterance.voice = preferredVoice;
+                    }
+                    
+                    utterance.onend = function() {
+                        currentIndex++;
+                        isPaused = false;
+                        
+                        // Hide pause button
+                        const pauseBtn = document.querySelector('.pause-btn');
+                        if (pauseBtn) {
+                            pauseBtn.style.display = 'none';
+                            pauseBtn.classList.remove('playing');
+                            pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                            pauseBtn.title = 'Pause Audio';
+                        }
+                        
+                        setTimeout(playNextSection, 1000); // 1 second pause between sections
+                    };
+                    
+                    utterance.onerror = function(event) {
+                        console.error('Speech error:', event.error);
+                        currentIndex++;
+                        isPaused = false;
+                        
+                        // Hide pause button
+                        const pauseBtn = document.querySelector('.pause-btn');
+                        if (pauseBtn) {
+                            pauseBtn.style.display = 'none';
+                            pauseBtn.classList.remove('playing');
+                            pauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+                            pauseBtn.title = 'Pause Audio';
+                        }
+                        
+                        setTimeout(playNextSection, 1000);
+                    };
+                    
+                    currentSpeech = utterance;
+                    speechSynthesis.speak(utterance);
+                    
+                    // Show pause button
+                    const pauseBtn = document.querySelector('.pause-btn');
+                    if (pauseBtn) {
+                        pauseBtn.style.display = 'flex';
+                        pauseBtn.classList.add('playing');
+                    }
+                } else {
+                    currentIndex++;
+                    setTimeout(playNextSection, 1000);
+                }
+            }
+            
+            // Show global pause button
+            const globalPauseBtn = document.getElementById('globalPauseBtn');
+            if (globalPauseBtn) {
+                globalPauseBtn.style.display = 'inline-flex';
+            }
+            
+            playNextSection();
+        }
+        
+        function downloadReport() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+            
+            // Simulate report generation
+            setTimeout(() => {
+                // Create a simple text report
+                let report = `ACCASM Document Analysis Report
+Generated by ACCASM
+================================
+
+`;
+                
+                // Add each page explanation
+                const pageCards = document.querySelectorAll('.result-card');
+                pageCards.forEach((card, index) => {
+                    const title = card.querySelector('.card-title').textContent;
+                    const content = card.querySelector('.card-content').textContent.trim();
+                    report += `${title}:\n${content}\n\n`;
+                });
+                
+                report += `Generated on: ${new Date().toLocaleString()}`;
+                
+                // Create and download the file
+                const blob = new Blob([report], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gemini_analysis_report.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                loadingOverlay.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Add some interactive animations
+        document.querySelectorAll('.result-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Add click animation to buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
+

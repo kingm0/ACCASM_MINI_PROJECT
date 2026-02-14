@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Processing Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Optional link to CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #4CAF50;
+        }
+        .container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 40px;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        .left {
+            margin-right: 20px;
+        }
+        .left img {
+            max-width: 90%;
+            height: auto;
+        }
+        .right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .button.red { background-color: #2bf838; }
+        .button.blue { background-color: #2196F3; }
+        .button.green { background-color: #4CAF50; }
+        .button:hover {
+            background-color: #ddd;
+        }
+        .button.fig{
+          background-color: #d66305; 
+        }
+        .button.orange{
+            background-color: #daa60d;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        audio {
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Processing Results</h1>
+
+    <!-- Display all Simple Images first -->
+    <h2>Simple Images</h2>
+    {% for i in range(image_urls|length) %}
+        <div class="container">
+            <div class="left">
+                <img src="{{ image_urls[i] }}" alt="Simple Image">
+            </div>
+            <div class="right">
+                <button class="button" ><a href="equations">Equation</a></button>
+                <button class="button red">Title</button>
+                <button class="button blue">Text</button>
+                <button class="button orange">Table</button>
+                <button class="button fig">Figure</button>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Display Detailed Images with Extracted Text, LaTeX, and Audio -->
+    <h2>Detailed Images</h2>
+    {% for i in range(image_urls_with_details|length) %}
+        <div class="content">
+            <h2>Segment {{ i + 1 }} - Detailed Information</h2>
+
+            <img src="{{ image_urls_with_details[i] }}" alt="Detailed Image">
+
+            <h3>Extracted Text:</h3>
+            <p>{{ texts[i] }}</p>
+
+            <h3>Editable LaTeX:</h3>
+            <textarea id="latex_{{ i }}" name="latex_{{ i }}">{{ latex[i] }}</textarea>
+
+            <h3>Audio:</h3>
+            <audio controls>
+                <source src="{{ audio_urls[i] }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    {% endfor %}
+</body>
+</html>

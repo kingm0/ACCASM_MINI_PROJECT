@@ -1,0 +1,40 @@
+# Complete Python Requirements for ACCASM Project
+
+# Web Framework
+Flask>=2.0.0
+Werkzeug>=2.0.0
+gunicorn>=21.0.0
+python-dotenv>=1.0.0
+
+# Computer Vision and Image Processing
+opencv-python-headless>=4.5.0
+numpy>=1.21.0
+Pillow>=9.0.0
+matplotlib>=3.5.0
+
+# PDF Processing
+pdf2image>=1.16.0
+
+# LaTeX Processing
+pix2tex>=0.1.0
+pylatexenc>=2.10.0
+
+# Text-to-Speech
+gtts>=2.3.0
+
+# AI/ML APIs
+google-generativeai>=0.3.0
+groq>=0.4.0
+
+# Deep Learning and ML Frameworks
+torch>=1.7.1
+torchvision>=0.8.0
+transformers>=4.18.0
+safetensors>=0.4.3
+
+# Data Processing
+pandas>=1.0.0
+scipy>=1.10.0
+
+# Configuration and Utilities
+PyYAML>=5.4.1
